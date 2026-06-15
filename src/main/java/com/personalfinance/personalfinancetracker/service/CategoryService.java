@@ -1,0 +1,65 @@
+package com.personalfinance.personalfinancetracker.service;
+
+import com.personalfinance.personalfinancetracker.dto.CategoryRequest;
+import com.personalfinance.personalfinancetracker.dto.CategoryResponse;
+import com.personalfinance.personalfinancetracker.entity.Category;
+import com.personalfinance.personalfinancetracker.entity.User;
+import com.personalfinance.personalfinancetracker.exception.DuplicateResourceException;
+import com.personalfinance.personalfinancetracker.exception.ResourceNotFoundException;
+import com.personalfinance.personalfinancetracker.repository.CategoryRepository;
+import com.personalfinance.personalfinancetracker.repository.TransactionRepository;
+import com.personalfinance.personalfinancetracker.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class CategoryService {
+
+    private final CategoryRepository categoryRepository;
+    private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
+
+    public CategoryResponse createCategory(CategoryRequest request, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (categoryRepository.existsByNameAndUserId(request.getName(), user.getId())) {
+            throw new DuplicateResourceException("Category already exists");
+        }
+
+        Category category = Category.builder()
+                .name(request.getName())
+                .categoryType(request.getType())
+                .description(request.getDescription())
+                .user(user)
+                .build();
+
+        Category saved = categoryRepository.save(category);
+        return mapToResponse(saved);
+
+    }
+
+    public List<CategoryResponse> getUserCategories(String username) {
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        return categoryRepository.findByUserId(user.getId())
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    private CategoryResponse mapToResponse(Category category){
+        return CategoryResponse.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .type(category.getCategoryType())
+                .description(category.getDescription())
+                .build();
+    }
+}
