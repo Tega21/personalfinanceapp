@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getDashboardSummary } from '../services/dashboardService';
 import type { DashboardSummary } from '../services/dashboardService';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import './Dashboard.css';
 
 const COLORS = ['#6B21A8', '#9333EA', '#C084FC', '#A855F7', '#7E22CE', '#D8B4FE'];
 
@@ -68,7 +69,8 @@ const Dashboard = () => {
                                 cx="50%"
                                 cy="50%"
                                 outerRadius={100}
-                                label={(entry) => entry.categoryName}
+                                // label={(entry) => entry.categoryName}
+                                label={(entry: any) => (entry as {categoryName: string}).categoryName}
                             >
                                 {summary.categoryBreakdown.map((_, index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

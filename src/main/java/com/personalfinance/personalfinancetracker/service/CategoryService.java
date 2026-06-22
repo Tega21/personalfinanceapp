@@ -3,6 +3,7 @@ package com.personalfinance.personalfinancetracker.service;
 import com.personalfinance.personalfinancetracker.dto.CategoryRequest;
 import com.personalfinance.personalfinancetracker.dto.CategoryResponse;
 import com.personalfinance.personalfinancetracker.entity.Category;
+import com.personalfinance.personalfinancetracker.entity.CategoryType;
 import com.personalfinance.personalfinancetracker.entity.User;
 import com.personalfinance.personalfinancetracker.exception.DuplicateResourceException;
 import com.personalfinance.personalfinancetracker.exception.ResourceNotFoundException;
@@ -19,6 +20,25 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CategoryService {
 
+    private record DefaultCategory(String name, CategoryType type) {}
+
+    private static final List<DefaultCategory> DEFAULT_CATEGORIES = List.of(
+            new DefaultCategory("Food & Dining", CategoryType.EXPENSE),
+            new DefaultCategory("Groceries", CategoryType.EXPENSE),
+            new DefaultCategory("Transportation", CategoryType.EXPENSE),
+            new DefaultCategory("Housing", CategoryType.EXPENSE),
+            new DefaultCategory("Utilities", CategoryType.EXPENSE),
+            new DefaultCategory("Bills & Subscriptions", CategoryType.EXPENSE),
+            new DefaultCategory("Shopping", CategoryType.EXPENSE),
+            new DefaultCategory("Entertainment", CategoryType.EXPENSE),
+            new DefaultCategory("Health & Medical", CategoryType.EXPENSE),
+            new DefaultCategory("Personal Care", CategoryType.EXPENSE),
+            new DefaultCategory("Travel", CategoryType.EXPENSE),
+            new DefaultCategory("Education", CategoryType.EXPENSE),
+            new DefaultCategory("Gifts & Donations", CategoryType.EXPENSE),
+            new DefaultCategory("Income", CategoryType.INCOME),
+            new DefaultCategory("Other", CategoryType.EXPENSE)
+    );
     private final CategoryRepository categoryRepository;
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
@@ -61,5 +81,24 @@ public class CategoryService {
                 .type(category.getCategoryType())
                 .description(category.getDescription())
                 .build();
+    }
+
+    /**
+     * Creates the 15 default categories for a newly registered user.
+     * Called once at registration so every user starts with a usable
+     * category list without having to create categories manually.
+     *
+     * @param user the newly registered user to seed categories for
+     */
+    public void seedDefaultCategories(User user) {
+        List<Category> categories = DEFAULT_CATEGORIES.stream()
+                .map(defaultCategory -> Category.builder()
+                        .name(defaultCategory.name())
+                        .categoryType(defaultCategory.type())
+                        .user(user)
+                        .build())
+                .collect(Collectors.toList());
+
+        categoryRepository.saveAll(categories);
     }
 }

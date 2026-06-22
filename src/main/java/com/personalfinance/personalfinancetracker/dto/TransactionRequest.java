@@ -8,6 +8,11 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * Request payload for creating or updating a transaction.
+ * USed by POST /api/transactions and PUT /api/transactions/{id}
+ * All fields except description are required. Amount must be positive
+ */
 @Data
 public class TransactionRequest {
 

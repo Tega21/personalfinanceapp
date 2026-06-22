@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
+import './Auth.css';
 
 const Register = () => {
     const [username, setUsername] = useState('');

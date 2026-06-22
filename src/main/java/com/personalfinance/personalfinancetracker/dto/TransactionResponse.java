@@ -9,6 +9,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Response payload representing a single transaction, returned by
+ * the transaction CRUD endpoints and is embedded in Dashboard's recent
+ * transactions list. It flattens the category relationship to
+ * categoryName/categoryId instead of nesting full Category object.
+ * Keeps the payload simple for the frontend.
+ */
 @Data
 @Builder
 @AllArgsConstructor

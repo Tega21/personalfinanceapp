@@ -5,6 +5,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+/**
+ * Request payload for registering new account. Used by
+ * POST /api/auth/register. Validation constraints are mirrored
+ * client side in the React Register form for feedback, but the
+ * annotations are the actual enforcement boundary.
+ */
 @Data
 public class RegisterRequest {
 

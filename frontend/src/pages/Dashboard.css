@@ -1,0 +1,70 @@
+.dashboard-page {
+    padding: 2rem;
+    color: var(--color-black);
+}
+
+.dashboard-page h1 {
+    margin-bottom: 1.5rem;
+}
+
+.summary-cards {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.summary-card {
+    flex: 1;
+    border: 1px solid var(--color-gray-border);
+    border-radius: 8px;
+    padding: 1.25rem;
+}
+
+.summary-card h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.95rem;
+    color: var(--color-black);
+    font-weight: 600;
+}
+
+.summary-card p {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.amount-positive {
+    color: #15803d;
+}
+
+.amount-negative {
+    color: #dc2626;
+}
+
+.dashboard-section {
+    margin-bottom: 2.5rem;
+}
+
+.dashboard-section h2 {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+.transactions-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.transactions-table th,
+.transactions-table td {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--color-gray-border);
+}
+
+.transactions-table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: #555;
+}

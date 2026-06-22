@@ -19,8 +19,9 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final CategoryService categoryService;
 
-    public AuthResponse register (RegisterRequest request){
+    public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateResourceException("Username is already taken");
         }
@@ -35,6 +36,7 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
+        categoryService.seedDefaultCategories(user);
 
         String token = jwtService.generateToken(user.getUsername());
         return new AuthResponse(token, user.getUsername(), user.getEmail());

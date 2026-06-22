@@ -5,6 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+/**
+ * Request payload for creating a new category.
+ * Used by POST /api/category. Name and type are needed.
+ */
 @Data
 public class CategoryRequest {
 

@@ -22,6 +22,12 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
+/**
+ *
+ * Configures Spring Security for the application. JWT-based authentication, CORS
+ * rules for the frontend, stateless session management, and which endpoints are going
+ * to be publicly accessible versus needing authentication.
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -30,6 +36,16 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
 
+    /**
+     * Defines the main security filter chain. Disables CSRF since not needed for JWT
+     * API, enables CORS, permits unauthenticated access to ap/auth/** endpoints, requires
+     * authentication for everything else. Inserts the JWT filter before Spring's
+     * authentication filter
+     *
+     * @param http the HTTPSecurity builder given by Spring Security
+     * @return the configured SecuirtyChainFilter
+     * @throws Exception if security configuration fails to build
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -48,6 +64,13 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Builds authentication provider that is used to validate username/password
+     * credentials against database.
+     *
+     * @return a DAOAuthenticationProvider wired with app's UserDetailsService
+     * and password encoder
+     */
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -56,16 +79,35 @@ public class SecurityConfig {
         return provider;
     }
 
+    /**
+     * Exposes Spring Security AuthenticationManager as bean so it can be injected
+     * elsewhere in application
+     *
+     * @param config the authentication configuration from Spring Security
+     * @return the application's AuthenticationManager
+     * @throws Exception if AuthenticationManager cannot be retrieved
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
+    /**
+     *Provides password hashing used across the application.
+     *
+     * @return a BCryptPasswordEncoder instance
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     *Configures CORS so frontend(on localhost:3000) is permitted to make
+     * requests to this API. Otherwise runs on localhost:8000.
+     *
+     * @return CORS configuration that is used on ALL endpoints
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
