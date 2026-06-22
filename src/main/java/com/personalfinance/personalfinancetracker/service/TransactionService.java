@@ -11,6 +11,7 @@ import com.personalfinance.personalfinancetracker.repository.TransactionReposito
 import com.personalfinance.personalfinancetracker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,6 +45,7 @@ public class TransactionService {
 
     }
 
+    @Transactional(readOnly = true)
     public List<TransactionResponse> getUserTransactions(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -68,7 +70,7 @@ public class TransactionService {
         transactionRepository.delete(transaction);
     }
 
-    private TransactionResponse mapToResponse(Transaction transaction) {
+    public TransactionResponse mapToResponse(Transaction transaction) {
         return TransactionResponse.builder()
                 .id(transaction.getId())
                 .amount(transaction.getAmount())

@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Data
 public class TransactionRequest {
 
-    @NotNull(message = "Amountt is required")
+    @NotNull(message = "Amount is required")
     @Positive(message = "Amount must be positive")
     private BigDecimal amount;
 

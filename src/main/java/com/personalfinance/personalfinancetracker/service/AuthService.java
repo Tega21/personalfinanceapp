@@ -5,7 +5,7 @@ import com.personalfinance.personalfinancetracker.dto.LoginRequest;
 import com.personalfinance.personalfinancetracker.dto.RegisterRequest;
 import com.personalfinance.personalfinancetracker.entity.User;
 import com.personalfinance.personalfinancetracker.exception.DuplicateResourceException;
-import com.personalfinance.personalfinancetracker.exception.ResourceNotFoundException;
+import com.personalfinance.personalfinancetracker.exception.InvalidCredentialsException;
 import com.personalfinance.personalfinancetracker.repository.UserRepository;
 import com.personalfinance.personalfinancetracker.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -40,12 +40,12 @@ public class AuthService {
         return new AuthResponse(token, user.getUsername(), user.getEmail());
     }
 
-    public AuthResponse login (LoginRequest request){
+    public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid username or password"));
 
-        if(!passwordEncoder.matches(request.getPassword(),user.getPassword())){
-            throw new RuntimeException("Invalid password");
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new InvalidCredentialsException("Invalid username or password");
         }
 
         String token = jwtService.generateToken(user.getUsername());
