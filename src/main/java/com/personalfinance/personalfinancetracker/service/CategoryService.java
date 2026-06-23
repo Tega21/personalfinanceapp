@@ -7,6 +7,7 @@ import com.personalfinance.personalfinancetracker.entity.CategoryType;
 import com.personalfinance.personalfinancetracker.entity.User;
 import com.personalfinance.personalfinancetracker.exception.DuplicateResourceException;
 import com.personalfinance.personalfinancetracker.exception.ResourceNotFoundException;
+import com.personalfinance.personalfinancetracker.exception.UnauthorizedActionException;
 import com.personalfinance.personalfinancetracker.repository.CategoryRepository;
 import com.personalfinance.personalfinancetracker.repository.TransactionRepository;
 import com.personalfinance.personalfinancetracker.repository.UserRepository;
@@ -72,6 +73,26 @@ public class CategoryService {
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Deletes a category, after verifying it belongs to the authenticated user.
+     *
+     * @param id the ID of the category to delete
+     * @param username the authenticated user's username
+     */
+    public void deleteCategory(Long id, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+
+        if (!category.getUser().getId().equals(user.getId())) {
+            throw new UnauthorizedActionException("You do not have permission to delete this category");
+        }
+
+        categoryRepository.delete(category);
     }
 
     private CategoryResponse mapToResponse(Category category){

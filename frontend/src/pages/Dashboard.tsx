@@ -6,15 +6,30 @@ import './Dashboard.css';
 
 const COLORS = ['#6B21A8', '#9333EA', '#C084FC', '#A855F7', '#7E22CE', '#D8B4FE'];
 
+const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+/**
+ * Dashboard screen. Shows the authenticated user's income/expense totals,
+ * net cash flow, a category spending pie chart, and recent transactions
+ * for a selectable month.
+ */
 const Dashboard = () => {
+    const now = new Date();
+    const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
+    const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+
     const [summary, setSummary] = useState<DashboardSummary | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
         const fetchSummary = async () => {
+            setIsLoading(true);
             try {
-                const data = await getDashboardSummary();
+                const data = await getDashboardSummary(selectedMonth, selectedYear);
                 setSummary(data);
             } catch (err) {
                 setError('Failed to load dashboard data.');
@@ -24,7 +39,25 @@ const Dashboard = () => {
         };
 
         fetchSummary();
-    }, []);
+    }, [selectedMonth, selectedYear]);
+
+    const goToPreviousMonth = () => {
+        if (selectedMonth === 1) {
+            setSelectedMonth(12);
+            setSelectedYear(selectedYear - 1);
+        } else {
+            setSelectedMonth(selectedMonth - 1);
+        }
+    };
+
+    const goToNextMonth = () => {
+        if (selectedMonth === 12) {
+            setSelectedMonth(1);
+            setSelectedYear(selectedYear + 1);
+        } else {
+            setSelectedMonth(selectedMonth + 1);
+        }
+    };
 
     if (isLoading) {
         return <p>Loading dashboard...</p>;
@@ -37,6 +70,14 @@ const Dashboard = () => {
     return (
         <div className="dashboard-page">
             <h1>Dashboard</h1>
+
+            <div className="month-navigator">
+                <button onClick={goToPreviousMonth} className="nav-arrow">←</button>
+                <span className="month-label">
+          {monthNames[selectedMonth - 1]} {selectedYear}
+        </span>
+                <button onClick={goToNextMonth} className="nav-arrow">→</button>
+            </div>
 
             <div className="summary-cards">
                 <div className="summary-card">
@@ -69,8 +110,7 @@ const Dashboard = () => {
                                 cx="50%"
                                 cy="50%"
                                 outerRadius={100}
-                                // label={(entry) => entry.categoryName}
-                                label={(entry: any) => (entry as {categoryName: string}).categoryName}
+                                label={(entry: any) => (entry as { categoryName: string }).categoryName}
                             >
                                 {summary.categoryBreakdown.map((_, index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

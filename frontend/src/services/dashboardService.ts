@@ -25,7 +25,20 @@ export interface DashboardSummary {
     recentTransactions: TransactionResponse[];
 }
 
-export const getDashboardSummary = async (): Promise<DashboardSummary> => {
-    const response = await api.get<DashboardSummary>('/dashboard/summary');
+/**
+ * Retrieves the dashboard summary for a given month and year.
+ * If month/year are omitted, the backend defaults to the current month.
+ *
+ * @param month optional month (1-12) to retrieve
+ * @param year optional year to retrieve
+ * @returns the dashboard summary for the requested month
+ */
+export const getDashboardSummary = async (
+    month?: number,
+    year?: number
+): Promise<DashboardSummary> => {
+    const response = await api.get<DashboardSummary>('/dashboard/summary', {
+        params: { month, year },
+    });
     return response.data;
 };

@@ -4,6 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import java.util.stream.Collectors;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -44,5 +47,35 @@ public class GlobalExceptionHandler {
                 "message", message
         );
         return ResponseEntity.status(status).body(body);
+    }
+
+    /**
+     * Handles @Valid validation failures (e.g., missing required fields,
+     * invalid email format, password too short) and returns a clean 400
+     * with field-specific error messages, instead of falling through to
+     * the generic 500 handler.
+     *
+     * @param ex the validation exception thrown by Spring when @Valid fails
+     * @return 400 Bad Request with a message listing each invalid field
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        return buildResponse(HttpStatus.BAD_REQUEST, message);
+    }
+
+    /**
+     * Handles malformed request bodies, including invalid enum values
+     * (e.g., a transaction "type" that isn't INCOME or EXPENSE) that fail
+     * during JSON deserialization, before validation even runs.
+     *
+     * @param ex the exception thrown when the request body can't be parsed
+     * @return 400 Bad Request with a generic malformed-request message
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleMalformedJson(HttpMessageNotReadableException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "Malformed request body or invalid field value.");
     }
 }

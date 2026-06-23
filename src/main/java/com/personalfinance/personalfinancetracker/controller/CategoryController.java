@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -36,9 +37,24 @@ public class CategoryController {
     public ResponseEntity<CategoryResponse> createCategory(
             @Valid @RequestBody CategoryRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(
+        return ResponseEntity.status(HttpStatus.CREATED).body(
                 categoryService.createCategory(request, userDetails.getUsername())
         );
+    }
+
+    /**
+     * Deletes a category, after verifying it belongs to the authenticated user.
+     *
+     * @param id the ID of the category to delete
+     * @param userDetails the authenticated user, injected from the JWT
+     * @return 204 No Content on successful deletion
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategory(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        categoryService.deleteCategory(id, userDetails.getUsername());
+        return ResponseEntity.noContent().build();
     }
 
     /**
