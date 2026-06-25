@@ -57,6 +57,7 @@ public class CategoryService {
                 .categoryType(request.getType())
                 .description(request.getDescription())
                 .user(user)
+                .isDefault(false)
                 .build();
 
         Category saved = categoryRepository.save(category);
@@ -101,6 +102,7 @@ public class CategoryService {
                 .name(category.getName())
                 .type(category.getCategoryType())
                 .description(category.getDescription())
+                .isDefault(category.isDefault())
                 .build();
     }
 
@@ -117,6 +119,7 @@ public class CategoryService {
                         .name(defaultCategory.name())
                         .categoryType(defaultCategory.type())
                         .user(user)
+                        .isDefault(true)
                         .build())
                 .collect(Collectors.toList());
 

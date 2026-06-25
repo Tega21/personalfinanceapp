@@ -37,6 +37,9 @@ public class Category {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "is_default", nullable = false)
+    private boolean isDefault;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

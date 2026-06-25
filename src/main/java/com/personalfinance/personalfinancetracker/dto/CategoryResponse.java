@@ -4,6 +4,7 @@ import com.personalfinance.personalfinancetracker.entity.CategoryType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Response payload representing a category, returned by
@@ -18,4 +19,7 @@ public class CategoryResponse {
     private String name;
     private CategoryType type;
     private String description;
+
+    @JsonProperty("isDefault")
+    private boolean isDefault;
 }

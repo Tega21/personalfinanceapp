@@ -44,7 +44,8 @@ public class DashboardService {
                 user.getId(), TransactionType.EXPENSE, startDate, endDate);
 
         List<com.personalfinance.personalfinancetracker.dto.TransactionResponse> recentTransactions =
-                transactionRepository.findTop5ByUserIdOrderByTransactionDateDesc(user.getId())
+                transactionRepository.findTop5ByUserIdAndTransactionDateBetweenOrderByTransactionDateDesc(
+                                user.getId(), startDate, endDate)
                         .stream()
                         .map(transactionService::mapToResponse)
                         .collect(Collectors.toList());

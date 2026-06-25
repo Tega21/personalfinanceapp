@@ -17,6 +17,7 @@ const Navbar = () => {
             <div className="navbar-links">
                 <Link to="/dashboard">Dashboard</Link>
                 <Link to="/transactions">Transactions</Link>
+                <Link to="/categories">Categories</Link>
                 <span className="navbar-username">{username}</span>
                 <button onClick={handleLogout} className="navbar-logout">
                     Logout

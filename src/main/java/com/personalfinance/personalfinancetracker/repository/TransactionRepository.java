@@ -19,6 +19,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findByUserIdOrderByTransactionDateDesc(Long userId);
     List<Transaction> findByCategoryIdAndUserIdOrderByTransactionDateDesc(Long categoryId, Long userId);
+    List<Transaction> findTop5ByUserIdAndTransactionDateBetweenOrderByTransactionDateDesc(
+            Long userId, LocalDate startDate, LocalDate endDate);
 
     @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t " +
             "WHERE t.user.id = :userId AND t.type = :type " +

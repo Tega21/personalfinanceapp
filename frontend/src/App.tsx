@@ -4,6 +4,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import ProtectedRoute from './components/ProtectedRoute';
+import Categories from './pages/Categories';
 
 function App() {
     return (
@@ -27,6 +28,14 @@ function App() {
                 }
             />
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route
+                path="/categories"
+                element={
+                    <ProtectedRoute>
+                        <Categories />
+                    </ProtectedRoute>
+                }
+            />
         </Routes>
     );
 }
