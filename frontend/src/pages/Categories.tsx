@@ -10,8 +10,8 @@ import './Categories.css';
 
 /**
  * Categories management screen. Lists the user's categories split into
- * two sections — 15 seeded defaults and any custom ones the user has
- * created — and supports creating and deleting custom categories.
+ * two sections: 15 created defaults and any custom ones the user has
+ * created, and supports creating and deleting custom categories.
  */
 const Categories = () => {
     const [categories, setCategories] = useState<CategoryResponse[]>([]);

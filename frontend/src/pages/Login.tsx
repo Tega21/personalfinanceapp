@@ -5,6 +5,10 @@ import { login } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
 import './Auth.css';
 
+/**
+ * Login page. Authenticates the user against the backend and, on
+ * success, stores the JWT via AuthContext and redirects to /dashboard.
+ */
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -14,6 +18,14 @@ const Login = () => {
     const navigate = useNavigate();
     const { login: setAuthState } = useAuth();
 
+    /**
+     * Submits the login form. Calls the backend login endpoint, and on
+     * success updates AuthContext and navigates to the dashboard. On
+     * failure, displays a generic error message without revealing
+     * whether the username or password was incorrect.
+     *
+     * @param e the form submit event
+     */
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError('');

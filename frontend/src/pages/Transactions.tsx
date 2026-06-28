@@ -30,6 +30,9 @@ const Transactions = () => {
     const [description, setDescription] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    /**
+     * Loads the user's transactions and categories in parallel on mount.
+     */
     const loadData = async () => {
         try {
             const [transactionData, categoryData] = await Promise.all([
@@ -73,6 +76,14 @@ const Transactions = () => {
         setShowForm(true);
     };
 
+    /**
+     * Submits the add/edit form. Calls createTransaction or
+     * updateTransaction depending on whether editingId is set, and
+     * updates local state with the result rather than refetching the
+     * whole list.
+     *
+     * @param e the form submit event
+     */
     const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsSubmitting(true);

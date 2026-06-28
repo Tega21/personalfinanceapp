@@ -2,6 +2,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
+/**
+ * Persistent navigation bar shown on all authenticated pages
+ * (rendered by ProtectedRoute). Provides navigation to Dashboard,
+ * Transactions, and Categories, displays the username, and
+ * handles logout.
+ */
 const Navbar = () => {
     const { username, logout } = useAuth();
     const navigate = useNavigate();

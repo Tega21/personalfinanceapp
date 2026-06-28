@@ -5,6 +5,11 @@ import { register } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
 import './Auth.css';
 
+/**
+ * Registration page. Creates a new account, which also triggers
+ * automatic creation of 15 default categories on the backend. On
+ * success, stores the JWT via AuthContext and redirects to /dashboard.
+ */
 const Register = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -15,6 +20,13 @@ const Register = () => {
     const navigate = useNavigate();
     const { login: setAuthState } = useAuth();
 
+    /**
+     * Submits the registration form. Calls the backend register
+     * endpoint, and on success updates AuthContext and navigates to
+     * the dashboard.
+     *
+     * @param e the form submit event
+     */
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError('');
