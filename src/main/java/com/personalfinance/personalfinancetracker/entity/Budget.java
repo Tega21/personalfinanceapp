@@ -13,6 +13,12 @@ import java.time.LocalDateTime;
 @Table(name = "budgets", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id", "category_id", "month", "year"})
 })
+
+/**
+ * Represents a monthly spending limit a user sets for a specific category.
+ * The unique constraint on (user_id, category_id, month, year) ensures a
+ * user can only have one budget per category per month.
+ */
 @Data
 @Builder
 @NoArgsConstructor

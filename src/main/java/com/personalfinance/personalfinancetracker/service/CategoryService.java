@@ -17,6 +17,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Manages category creation, retrieval, and deletion, including creating
+ * the 15 default categories for new users.
+ */
 @Service
 @RequiredArgsConstructor
 public class CategoryService {
@@ -44,6 +48,15 @@ public class CategoryService {
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
 
+    /**
+     * Creates a new custom category for the authenticated user.
+     *
+     * @param request the category's name, type, and optional description
+     * @param username the authenticated user's username
+     * @return the created category
+     * @throws ResourceNotFoundException if the user doesn't exist
+     * @throws DuplicateResourceException if the user already has a category with this name
+     */
     public CategoryResponse createCategory(CategoryRequest request, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -65,6 +78,13 @@ public class CategoryService {
 
     }
 
+    /**
+     * Retrieves all categories belonging to the authenticated user.
+     *
+     * @param username the authenticated user's username
+     * @return the user's full category list (defaults plus any custom categories)
+     * @throws ResourceNotFoundException if the user doesn't exist
+     */
     public List<CategoryResponse> getUserCategories(String username) {
 
         User user = userRepository.findByUsername(username)

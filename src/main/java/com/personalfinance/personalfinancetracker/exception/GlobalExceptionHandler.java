@@ -11,6 +11,12 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+/**
+ * Centralized exception handler that converts exceptions thrown anywhere
+ * in the application into clean, consistent JSON error responses with the
+ * appropriate HTTP status code, rather than letting them fall through to
+ * default Spring/Tomcat error pages or an unhelpful generic 500.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

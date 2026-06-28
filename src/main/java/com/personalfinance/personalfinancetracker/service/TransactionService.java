@@ -17,6 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Manages transaction creation, retrieval, update, and deletion,
+ * the core CRUD operations behind the Transactions screen and the
+ * data source for the Dashboard's aggregated totals.
+ */
 @Service
 @RequiredArgsConstructor
 public class TransactionService {
@@ -25,6 +30,14 @@ public class TransactionService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
 
+    /**
+     * Creates a new transaction for the authenticated user.
+     *
+     * @param request the transaction's amount, type, date, description, and category
+     * @param username the authenticated user's username
+     * @return the created transaction
+     * @throws ResourceNotFoundException if the user or category doesn't exist
+     */
     public TransactionResponse createTransaction(TransactionRequest request, String username){
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -46,6 +59,16 @@ public class TransactionService {
 
     }
 
+    /**
+     * Gets all transactions belonging to the authenticated user,
+     * sorted by most recent date first. Wrapped in a read-only
+     * transaction so the database session stays open through the
+     * mapping step.
+     *
+     * @param username the authenticated user's username
+     * @return the user's full transaction list
+     * @throws ResourceNotFoundException if the user doesn't exist
+     */
     @Transactional(readOnly = true)
     public List<TransactionResponse> getUserTransactions(String username) {
         User user = userRepository.findByUsername(username)
@@ -57,6 +80,15 @@ public class TransactionService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Deletes a transaction, after verifying it belongs to the
+     * authenticated user.
+     *
+     * @param id the ID of the transaction to delete
+     * @param username the authenticated user's username
+     * @throws ResourceNotFoundException if the user or transaction doesn't exist
+     * @throws UnauthorizedActionException if the transaction belongs to a different user
+     */
     public void deleteTransaction(Long id, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -71,6 +103,17 @@ public class TransactionService {
         transactionRepository.delete(transaction);
     }
 
+    /**
+     * Updates an existing transaction, after verifying it belongs to
+     * the authenticated user.
+     *
+     * @param id the ID of the transaction to update
+     * @param request the updated amount, type, date, description, and category
+     * @param username the authenticated user's username
+     * @return the updated transaction
+     * @throws ResourceNotFoundException if the user, transaction, or category doesn't exist
+     * @throws UnauthorizedActionException if the transaction belongs to a different user
+     */
     @Transactional
     public TransactionResponse updateTransaction(Long id, TransactionRequest request, String username) {
         User user = userRepository.findByUsername(username)
@@ -96,6 +139,13 @@ public class TransactionService {
         return mapToResponse(saved);
     }
 
+    /**
+     * Converts a Transaction entity into its response DTO, flattening
+     * the category relationship into categoryName/categoryId.
+     *
+     * @param transaction the entity to convert
+     * @return the corresponding response DTO
+     */
     public TransactionResponse mapToResponse(Transaction transaction) {
         return TransactionResponse.builder()
                 .id(transaction.getId())

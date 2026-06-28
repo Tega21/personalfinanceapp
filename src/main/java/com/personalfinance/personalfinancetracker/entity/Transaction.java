@@ -10,6 +10,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Represents a single income or expense entry recorded by a user.
+ * Every transaction belongs to exactly one user and one category,
+ * and powers both the Transactions list/CRUD screens and the
+ * Dashboard's aggregated totals and category breakdown.
+ */
 @Entity
 @Table(name = "transactions")
 @Data

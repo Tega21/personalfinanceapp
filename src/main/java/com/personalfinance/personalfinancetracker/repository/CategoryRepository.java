@@ -7,6 +7,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+/**
+ * Repository for Category entities. Supports retrieving a user's full
+ * category list and checking for duplicate category names within a
+ * single user's scope.
+ */
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 

@@ -6,6 +6,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+/**
+ * Repository for User entities. Backs authentication and
+ * registration (checking for duplicate usernames/emails
+ * before creating a new account).
+ */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 

@@ -12,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Handles user authentication like registration, login, and JWT issuance.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -21,6 +24,16 @@ public class AuthService {
     private final JwtService jwtService;
     private final CategoryService categoryService;
 
+    /**
+     * Registers a new user account. Rejects the request if the username
+     * or email is already taken, hashes the password with BCrypt, and
+     * seeds the new account with 15 default categories before issuing
+     * a JWT.
+     *
+     * @param request the new account's username, email, and password
+     * @return an AuthResponse containing the JWT and the new user's info
+     * @throws DuplicateResourceException if the username or email is already in use
+     */
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateResourceException("Username is already taken");
@@ -42,6 +55,15 @@ public class AuthService {
         return new AuthResponse(token, user.getUsername(), user.getEmail());
     }
 
+    /**
+     * Authenticates a user and issues a JWT on success. Uses the same
+     * generic exception for both an unknown username and a wrong
+     * password, so the response doesn't reveal which one was incorrect.
+     *
+     * @param request the login credentials (username and password)
+     * @return an AuthResponse containing the JWT and the user's info
+     * @throws InvalidCredentialsException if the username or password is incorrect
+     */
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid username or password"));

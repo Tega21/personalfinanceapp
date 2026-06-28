@@ -9,6 +9,11 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Represents a user's credit card account, tracking balance, credit limit,
+ * and the cardholder's name. Defined in the schema ahead of Sprint 3, when
+ * the controller/service and API endpoints will be built.
+ */
 @Entity
 @Table(name = "credit_card")
 @Data

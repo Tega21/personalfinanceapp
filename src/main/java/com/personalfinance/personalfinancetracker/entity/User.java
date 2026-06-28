@@ -13,6 +13,13 @@ import org.springframework.security.core.GrantedAuthority;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * Represents a registered user. Implements Spring Security's UserDetails
+ * so this entity can be used directly during authentication. Owns all of
+ * a user's data (transactions, budgets, credit cards, categories) via
+ * cascading one-to-many relationships, so deleting a user removes all of
+ * their associated records.
+ */
 @Entity
 @Table(name="users")
 @Data
@@ -58,6 +65,13 @@ public class User implements UserDetails {
         createdAt = LocalDateTime.now();
     }
 
+    /**
+     * Returns no granted authorities, since this application does not
+     * implement role-based authorization. Every authenticated user has
+     * the same level of access to their own data.
+     *
+     * @return an empty list of authorities
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
