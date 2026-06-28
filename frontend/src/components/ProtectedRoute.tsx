@@ -5,7 +5,7 @@ import Navbar from './Navbar';
 
 /**
  * Wraps routes that require authentication. Redirects unauthenticated
- * users to /login; otherwise renders the persistent Navbar above the
+ * users to /login. Otherwise, renders the persistent Navbar above the
  * wrapped page content.
  */
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
