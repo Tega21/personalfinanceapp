@@ -49,6 +49,27 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("endDate") LocalDate endDate);
 
     /**
+     * Sums a user's EXPENSE transactions within a specific category for a
+     * date range, used by BudgetService to calculate how much of a budget
+     * has been spent so far.
+     *
+     * @param userId the user to sum transactions for
+     * @param categoryId the category to scope the sum to
+     * @param startDate the first day of the date range (inclusive)
+     * @param endDate the last day of the date range (inclusive)
+     * @return the summed total of EXPENSE transactions, or 0 if none exist
+     */
+    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t " +
+            "WHERE t.user.id = :userId AND t.category.id = :categoryId " +
+            "AND t.type = 'EXPENSE' " +
+            "AND t.transactionDate BETWEEN :startDate AND :endDate")
+    BigDecimal sumExpensesByUserAndCategoryAndDateRange(
+            @Param("userId") Long userId,
+            @Param("categoryId") Long categoryId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+    /**
      * Aggregates transaction totals by category for a user within a date
      * range, used to build the Dashboard's category breakdown pie chart.
      * Uses a JPQL constructor expression to build CategoryBreakdown DTOs
@@ -66,6 +87,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             "WHERE t.user.id = :userId AND t.type = :type " +
             "AND t.transactionDate BETWEEN :startDate AND :endDate " +
             "GROUP BY t.category.id, t.category.name")
+
+
     List<CategoryBreakdown> findCategoryBreakdown(
             @Param("userId") Long userId,
             @Param("type") TransactionType type,

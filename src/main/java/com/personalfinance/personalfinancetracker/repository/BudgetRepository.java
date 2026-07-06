@@ -12,7 +12,7 @@ import java.util.*;
 
 public interface BudgetRepository extends JpaRepository<Budget,Long> {
 
-    List<Budget> findAllByUserId(Long userId);
+    List<Budget> findAllByUser_IdAndMonthAndYear(Long userId, Integer month, Integer year);
 
-    boolean existsByCategoryIdAndUserIdAndMonthAndYear(Long categoryId, Long userId, Integer month, Integer year);
+    boolean existsByCategory_IdAndUser_IdAndMonthAndYear(Long categoryId, Long userId, Integer month, Integer year);
 }
