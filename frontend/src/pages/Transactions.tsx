@@ -30,13 +30,23 @@ const Transactions = () => {
     const [description, setDescription] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const [filterCategoryId, setFilterCategoryId] = useState('');
+    const [filterStartDate, setFilterStartDate] = useState('');
+    const [filterEndDate, setFilterEndDate] = useState('');
+    const [filterKeyword, setFilterKeyword] = useState('');
+
     /**
      * Loads the user's transactions and categories in parallel on mount.
      */
     const loadData = async () => {
         try {
             const [transactionData, categoryData] = await Promise.all([
-                getTransactions(),
+                getTransactions(
+                    filterCategoryId ? parseInt(filterCategoryId) : undefined,
+                    filterStartDate || undefined,
+                    filterEndDate || undefined,
+                    filterKeyword || undefined
+                ),
                 getCategories(),
             ]);
             setTransactions(transactionData);
@@ -47,10 +57,9 @@ const Transactions = () => {
             setIsLoading(false);
         }
     };
-
     useEffect(() => {
         loadData();
-    }, []);
+    }, [filterCategoryId, filterStartDate, filterEndDate, filterKeyword]);
 
     const resetForm = () => {
         setEditingId(null);
@@ -153,6 +162,51 @@ const Transactions = () => {
             </div>
 
             {error && <p className="error-text">{error}</p>}
+
+            <div className="filter-bar">
+                <select
+                    value={filterCategoryId}
+                    onChange={(e) => setFilterCategoryId(e.target.value)}
+                >
+                    <option value="">All Categories</option>
+                    {categories.map((c) => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                </select>
+
+                <input
+                    type="date"
+                    value={filterStartDate}
+                    onChange={(e) => setFilterStartDate(e.target.value)}
+                    placeholder="Start date"
+                />
+
+                <input
+                    type="date"
+                    value={filterEndDate}
+                    onChange={(e) => setFilterEndDate(e.target.value)}
+                    placeholder="End date"
+                />
+
+                <input
+                    type="text"
+                    value={filterKeyword}
+                    onChange={(e) => setFilterKeyword(e.target.value)}
+                    placeholder="Search description..."
+                />
+
+                <button
+                    className="action-btn"
+                    onClick={() => {
+                        setFilterCategoryId('');
+                        setFilterStartDate('');
+                        setFilterEndDate('');
+                        setFilterKeyword('');
+                    }}
+                >
+                    Clear
+                </button>
+            </div>
 
             {showForm && (
                 <form className="transaction-form" onSubmit={handleFormSubmit}>

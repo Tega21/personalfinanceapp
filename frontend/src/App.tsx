@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import ProtectedRoute from './components/ProtectedRoute';
 import Categories from './pages/Categories';
+import Budgets from './pages/Budgets';
 
 function App() {
     return (
@@ -33,6 +34,15 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <Categories />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/budgets"
+                element={
+                    <ProtectedRoute>
+                        <Budgets />
                     </ProtectedRoute>
                 }
             />

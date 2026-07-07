@@ -31,8 +31,29 @@ export interface TransactionResponse {
  *
  * @returns the user's full transaction list
  */
-export const getTransactions = async (): Promise<TransactionResponse[]> => {
-    const response = await api.get<TransactionResponse[]>('/transactions');
+/**
+ * Retrieves the authenticated user's transactions with optional filters.
+ *
+ * @param categoryId optional category ID filter
+ * @param startDate optional start date filter (yyyy-MM-dd)
+ * @param endDate optional end date filter (yyyy-MM-dd)
+ * @param keyword optional description keyword filter
+ * @returns filtered transactions sorted by most recent date first
+ */
+export const getTransactions = async (
+    categoryId?: number,
+    startDate?: string,
+    endDate?: string,
+    keyword?: string
+): Promise<TransactionResponse[]> => {
+    const response = await api.get<TransactionResponse[]>('/transactions', {
+        params: {
+            ...(categoryId !== undefined && { categoryId }),
+            ...(startDate && { startDate }),
+            ...(endDate && { endDate }),
+            ...(keyword && { keyword }),
+        },
+    });
     return response.data;
 };
 

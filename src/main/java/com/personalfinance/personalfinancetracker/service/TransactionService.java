@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,22 +61,35 @@ public class TransactionService {
     }
 
     /**
-     * Gets all transactions belonging to the authenticated user,
-     * sorted by most recent date first. Wrapped in a read-only
-     * transaction so the database session stays open through the
-     * mapping step.
+     * Retrieves transactions for the authenticated user with optional
+     * filters for category, date range, and keyword search.
      *
      * @param username the authenticated user's username
-     * @return the user's full transaction list
+     * @param categoryId optional category ID filter
+     * @param startDate optional start date filter
+     * @param endDate optional end date filter
+     * @param keyword optional description keyword filter
+     * @return filtered transactions sorted by most recent date first
      * @throws ResourceNotFoundException if the user doesn't exist
      */
     @Transactional(readOnly = true)
-    public List<TransactionResponse> getUserTransactions(String username) {
+    public List<TransactionResponse> getUserTransactions(
+            String username,
+            Long categoryId,
+            LocalDate startDate,
+            LocalDate endDate,
+            String keyword) {
+
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return transactionRepository.findByUserIdOrderByTransactionDateDesc(user.getId())
                 .stream()
+                .filter(t -> categoryId == null || t.getCategory().getId().equals(categoryId))
+                .filter(t -> startDate == null || !t.getTransactionDate().isBefore(startDate))
+                .filter(t -> endDate == null || !t.getTransactionDate().isAfter(endDate))
+                .filter(t -> keyword == null || t.getDescription() != null &&
+                        t.getDescription().toLowerCase().contains(keyword.toLowerCase()))
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

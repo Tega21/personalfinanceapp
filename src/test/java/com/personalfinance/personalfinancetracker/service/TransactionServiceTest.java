@@ -129,7 +129,8 @@ class TransactionServiceTest {
         when(transactionRepository.findByUserIdOrderByTransactionDateDesc(1L))
                 .thenReturn(List.of(transaction));
 
-        List<TransactionResponse> result = transactionService.getUserTransactions("testuser");
+        List<TransactionResponse> result = transactionService.getUserTransactions(
+                "testuser", null, null, null, null);
 
         assertEquals(1, result.size());
         assertEquals("Groceries", result.get(0).getCategoryName());
@@ -143,7 +144,8 @@ class TransactionServiceTest {
         when(transactionRepository.findByUserIdOrderByTransactionDateDesc(1L))
                 .thenReturn(Collections.emptyList());
 
-        List<TransactionResponse> result = transactionService.getUserTransactions("testuser");
+        List<TransactionResponse> result = transactionService.getUserTransactions(
+                "testuser", null, null, null, null);
 
         assertTrue(result.isEmpty());
     }

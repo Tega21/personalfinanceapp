@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -42,17 +43,26 @@ public class TransactionController {
     }
 
     /**
-     * Gets all transactions that belong to the user, and is sorted
-     * by most recent transaction date first.
+     * Retrieves the authenticated user's transactions with optional
+     * filters for category, date range, and keyword search on description.
      *
-     * @param userDetails authenticated user injected from JWT
-     * @return 200 OK with the list of user's transactions
+     * @param categoryId optional category ID filter
+     * @param startDate optional start date filter (yyyy-MM-dd)
+     * @param endDate optional end date filter (yyyy-MM-dd)
+     * @param keyword optional description keyword filter
+     * @param userDetails the authenticated user, injected from the JWT
+     * @return 200 OK with the filtered transaction list
      */
     @GetMapping
     public ResponseEntity<List<TransactionResponse>> getUserTransactions(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(required = false) String keyword,
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(
-                transactionService.getUserTransactions(userDetails.getUsername())
+                transactionService.getUserTransactions(
+                        userDetails.getUsername(), categoryId, startDate, endDate, keyword)
         );
     }
 

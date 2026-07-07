@@ -96,4 +96,29 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("endDate") LocalDate endDate);
 
     List<Transaction> findTop5ByUserIdOrderByTransactionDateDesc(Long userId);
+
+    /**
+     * Retrieves transactions for a user with optional filters for category,
+     * date range, and keyword search on description. Any parameter that is
+     * null is ignored, making all filters optional and combinable.
+     *
+     * @param userId the user whose transactions to retrieve
+     * @param categoryId optional category filter (null = all categories)
+     * @param startDate optional start of date range (null = no lower bound)
+     * @param endDate optional end of date range (null = no upper bound)
+     * @param keyword optional description keyword (null = no keyword filter)
+     * @return matching transactions sorted by most recent date first
+     */
+    @Query("SELECT t FROM Transaction t WHERE t.user.id = :userId " +
+            "AND (:categoryId IS NULL OR t.category.id = :categoryId) " +
+            "AND (:startDate IS NULL OR t.transactionDate >= :startDate) " +
+            "AND (:endDate IS NULL OR t.transactionDate <= :endDate) " +
+            "AND (:keyword IS NULL OR LOWER(t.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "ORDER BY t.transactionDate DESC")
+    List<Transaction> findByUserIdWithFilters(
+            @Param("userId") Long userId,
+            @Param("categoryId") Long categoryId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("keyword") String keyword);
 }
