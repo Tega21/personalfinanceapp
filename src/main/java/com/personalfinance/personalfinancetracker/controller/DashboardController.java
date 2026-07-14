@@ -1,6 +1,7 @@
 package com.personalfinance.personalfinancetracker.controller;
 
 import com.personalfinance.personalfinancetracker.dto.DashboardSummary;
+import com.personalfinance.personalfinancetracker.dto.TrendDataPoint;
 import com.personalfinance.personalfinancetracker.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Exposes dashboard endpoint under /api/dahsboard.
@@ -51,6 +53,24 @@ public class DashboardController {
         return ResponseEntity.ok(
                 dashboardService.getDashboardSummary(
                         userDetails.getUsername(), resolvedMonth, resolvedYear)
+        );
+    }
+
+    /**
+     * Returns spending trend data for the last N months for the
+     * authenticated user, used to render the Dashboard line chart.
+     * Defaults to 6 months if no months parameter is provided.
+     *
+     * @param months the number of past months to include (default 6)
+     * @param userDetails the authenticated user, injected from the JWT
+     * @return 200 OK with a list of monthly expense totals
+     */
+    @GetMapping("/trends")
+    public ResponseEntity<List<TrendDataPoint>> getSpendingTrends(
+            @RequestParam(defaultValue = "6") int months,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(
+                dashboardService.getSpendingTrends(userDetails.getUsername(), months)
         );
     }
 }

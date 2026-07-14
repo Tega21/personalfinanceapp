@@ -2,6 +2,7 @@ package com.personalfinance.personalfinancetracker.service;
 
 import com.personalfinance.personalfinancetracker.dto.CategoryBreakdown;
 import com.personalfinance.personalfinancetracker.dto.DashboardSummary;
+import com.personalfinance.personalfinancetracker.dto.TrendDataPoint;
 import com.personalfinance.personalfinancetracker.entity.TransactionType;
 import com.personalfinance.personalfinancetracker.entity.User;
 import com.personalfinance.personalfinancetracker.exception.ResourceNotFoundException;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -75,5 +77,45 @@ public class DashboardService {
                 .categoryBreakdown(categoryBreakdown)
                 .recentTransactions(recentTransactions)
                 .build();
+    }
+
+    /**
+     * Builds a spending trend dataset for the last number of months,
+     * used to power the Dashboard's line chart. Each entry represents one
+     * calendar month with its total spending. Months are returned
+     * in chronological order (oldest first) so the chart reads left to
+     * right naturally. Months with no transactions return 0 instead of
+     * being omitted, so the chart always shows a complete, unbroken line.
+     *
+     * @param username the authenticated user's username
+     * @param months the number of past months to include (e.g., 6)
+     * @return a list of monthly expense totals in chronological order
+     * @throws ResourceNotFoundException if the user doesn't exist
+     */
+    public List<TrendDataPoint> getSpendingTrends(String username, int months) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        List<TrendDataPoint> trends = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        for (int i = months - 1; i >= 0; i--) {
+            LocalDate monthStart = today.minusMonths(i).withDayOfMonth(1);
+            LocalDate monthEnd = monthStart.withDayOfMonth(monthStart.lengthOfMonth());
+
+            BigDecimal total = transactionRepository.sumExpensesByUserAndDateRange(
+                    user.getId(), monthStart, monthEnd);
+
+            String label = monthStart.getMonth().getDisplayName(
+                    java.time.format.TextStyle.SHORT, java.util.Locale.ENGLISH)
+                    + " " + monthStart.getYear();
+
+            trends.add(TrendDataPoint.builder()
+                    .month(label)
+                    .totalExpenses(total)
+                    .build());
+        }
+
+        return trends;
     }
 }

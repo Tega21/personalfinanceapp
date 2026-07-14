@@ -121,4 +121,23 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("keyword") String keyword);
+
+    /**
+     * Sums all expense transactions for a user within a date range.
+     * Used by the trend chart to calculate monthly spending totals.
+     * Hardcodes expense type since trend data is always expense only.
+     * Returns 0 instead of null when no transactions exist for the range.
+     *
+     * @param userId the user to sum transactions for
+     * @param startDate the first day of the date range (inclusive)
+     * @param endDate the last day of the date range (inclusive)
+     * @return the summed total of EXPENSE transactions, or 0 if none exist
+     */
+    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t " +
+            "WHERE t.user.id = :userId AND t.type = 'EXPENSE' " +
+            "AND t.transactionDate BETWEEN :startDate AND :endDate")
+    BigDecimal sumExpensesByUserAndDateRange(
+            @Param("userId") Long userId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
 }

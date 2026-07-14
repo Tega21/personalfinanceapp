@@ -42,3 +42,24 @@ export const getDashboardSummary = async (
     });
     return response.data;
 };
+
+/**
+ * Shape of a single month's expense total for the trend chart.
+ */
+export interface TrendDataPoint {
+    month: string;
+    totalExpenses: number;
+}
+
+/**
+ * Retrieves spending trend data for the last N months.
+ *
+ * @param months the number of past months to include (default 6)
+ * @returns monthly expense totals in chronological order
+ */
+export const getSpendingTrends = async (months: number = 6): Promise<TrendDataPoint[]> => {
+    const response = await api.get<TrendDataPoint[]>('/dashboard/trends', {
+        params: { months }
+    });
+    return response.data;
+};

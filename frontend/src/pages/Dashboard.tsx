@@ -1,7 +1,18 @@
 import { useState, useEffect } from 'react';
-import { getDashboardSummary } from '../services/dashboardService';
-import type { DashboardSummary } from '../services/dashboardService';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { getDashboardSummary, getSpendingTrends } from '../services/dashboardService';
+import type { DashboardSummary, TrendDataPoint } from '../services/dashboardService';
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell
+} from 'recharts';
 import './Dashboard.css';
 
 const COLORS = ['#6B21A8', '#9333EA', '#C084FC', '#A855F7', '#7E22CE', '#D8B4FE'];
@@ -13,17 +24,17 @@ const monthNames = [
 
 /**
  * Dashboard screen. Shows the authenticated user's income/expense totals,
- * net cash flow, a category spending pie chart, and recent transactions
- * for a selectable month.
+ * net cash flow, a category spending pie chart, recent transactions
+ * for a selectable month, and a spending trend line chart.
  */
 const Dashboard = () => {
     const now = new Date();
     const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState(now.getFullYear());
-
     const [summary, setSummary] = useState<DashboardSummary | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+    const [trendData, setTrendData] = useState<TrendDataPoint[]>([]);
 
     useEffect(() => {
         const fetchSummary = async () => {
@@ -31,6 +42,8 @@ const Dashboard = () => {
             try {
                 const data = await getDashboardSummary(selectedMonth, selectedYear);
                 setSummary(data);
+                const trends = await getSpendingTrends(6);
+                setTrendData(trends);
             } catch (err) {
                 setError('Failed to load dashboard data.');
             } finally {
@@ -41,6 +54,9 @@ const Dashboard = () => {
         fetchSummary();
     }, [selectedMonth, selectedYear]);
 
+    /**
+     * Navigates the dashboard to the previous calendar month.
+     */
     const goToPreviousMonth = () => {
         if (selectedMonth === 1) {
             setSelectedMonth(12);
@@ -50,6 +66,9 @@ const Dashboard = () => {
         }
     };
 
+    /**
+     * Navigates the dashboard to the next calendar month.
+     */
     const goToNextMonth = () => {
         if (selectedMonth === 12) {
             setSelectedMonth(1);
@@ -74,8 +93,8 @@ const Dashboard = () => {
             <div className="month-navigator">
                 <button onClick={goToPreviousMonth} className="nav-arrow">←</button>
                 <span className="month-label">
-          {monthNames[selectedMonth - 1]} {selectedYear}
-        </span>
+                    {monthNames[selectedMonth - 1]} {selectedYear}
+                </span>
                 <button onClick={goToNextMonth} className="nav-arrow">→</button>
             </div>
 
@@ -152,6 +171,26 @@ const Dashboard = () => {
                         </tbody>
                     </table>
                 )}
+            </div>
+
+            <div className="trend-section">
+                <h2>Spending Trend</h2>
+                <ResponsiveContainer width="100%" height={250}>
+                    <LineChart data={trendData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip formatter={(value) => [`$${Number(value ?? 0).toFixed(2)}`, 'Expenses']} />
+                        <Line
+                            type="monotone"
+                            dataKey="totalExpenses"
+                            stroke="#6B21A8"
+                            strokeWidth={2}
+                            dot={{ r: 4 }}
+                            activeDot={{ r: 6 }}
+                        />
+                    </LineChart>
+                </ResponsiveContainer>
             </div>
         </div>
     );
