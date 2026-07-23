@@ -44,11 +44,11 @@ public class ProfileController {
      * @return 200 OK with the updated profile
      */
     @PutMapping("/email")
-    public ResponseEntity<ProfileResponse> updateEmail(
+    public ResponseEntity<ProfileResponse> updateProfile(
             @Valid @RequestBody UpdateProfileRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(
-                profileService.updateEmail(userDetails.getUsername(), request)
+                profileService.updateProfile(userDetails.getUsername(), request)
         );
     }
 

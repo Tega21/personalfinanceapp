@@ -19,4 +19,6 @@ public class ProfileResponse {
     private String username;
     private String email;
     private LocalDateTime createdAt;
+    private String firstName;
+    private String lastName;
 }

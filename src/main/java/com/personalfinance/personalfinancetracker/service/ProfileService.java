@@ -37,37 +37,46 @@ public class ProfileService {
         return ProfileResponse.builder()
                 .id(user.getId())
                 .username(user.getUsername())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
                 .email(user.getEmail())
                 .createdAt(user.getCreatedAt())
                 .build();
     }
 
     /**
-     * Updates the authenticated user's email address. Rejects the
-     * change if the new email is already in use by another account.
+     * Updates the authenticated user's profile information including
+     * email, first name, and last name. Rejects email changes if the
+     * new email is already in use by another account.
      *
      * @param username the authenticated user's username
-     * @param request the new email address
+     * @param request the updated profile fields
      * @return the updated profile
      * @throws ResourceNotFoundException if the user doesn't exist
-     * @throws DuplicateResourceException if the email is already taken
+     * @throws DuplicateResourceException if the new email is already taken
      */
-    public ProfileResponse updateEmail(String username, UpdateProfileRequest request) {
+    public ProfileResponse updateProfile(String username, UpdateProfileRequest request) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if (!user.getEmail().equals(request.getEmail()) &&
+        if (request.getEmail() != null &&
+                !user.getEmail().equals(request.getEmail()) &&
                 userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new DuplicateResourceException("Email is already in use");
         }
 
-        user.setEmail(request.getEmail());
+        if (request.getEmail() != null) user.setEmail(request.getEmail());
+        if (request.getFirstName() != null) user.setFirstName(request.getFirstName());
+        if (request.getLastName() != null) user.setLastName(request.getLastName());
+
         userRepository.save(user);
 
         return ProfileResponse.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
                 .createdAt(user.getCreatedAt())
                 .build();
     }

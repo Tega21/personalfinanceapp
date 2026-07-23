@@ -6,6 +6,7 @@ import Transactions from './pages/Transactions';
 import ProtectedRoute from './components/ProtectedRoute';
 import Categories from './pages/Categories';
 import Budgets from './pages/Budgets';
+import Profile from './pages/Profile';
 
 function App() {
     return (
@@ -46,6 +47,16 @@ function App() {
                     </ProtectedRoute>
                 }
             />
+
+            <Route
+                path="/profile"
+                element={
+                    <ProtectedRoute>
+                        <Profile />
+                    </ProtectedRoute>
+                }
+            />
+
         </Routes>
     );
 }

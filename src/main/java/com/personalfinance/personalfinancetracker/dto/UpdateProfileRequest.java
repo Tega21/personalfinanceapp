@@ -12,4 +12,7 @@ public class UpdateProfileRequest {
     @Email(message = "Must be a valid email address")
     @NotBlank(message = "Email is required")
     private String email;
+
+    private String firstName;
+    private String lastName;
 }

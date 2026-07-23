@@ -16,6 +16,8 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
 
     const navigate = useNavigate();
     const { login: setAuthState } = useAuth();
@@ -33,7 +35,7 @@ const Register = () => {
         setIsSubmitting(true);
 
         try {
-            const response = await register({ username, email, password });
+            const response = await register({ username, email, password, firstName, lastName });
             setAuthState(response);
             navigate('/dashboard');
         } catch (err) {
@@ -49,6 +51,24 @@ const Register = () => {
                 <h1>Create Account</h1>
 
                 {error && <p className="error-text">{error}</p>}
+
+                <label htmlFor="firstName">First Name</label>
+                <input
+                    id="firstName"
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                />
+
+                <label htmlFor="lastName">Last Name</label>
+                <input
+                    id="lastName"
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                />
 
                 <label htmlFor="username">Username</label>
                 <input
