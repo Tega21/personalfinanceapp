@@ -109,6 +109,11 @@
     text-decoration: none;
 }
 
+a.navbar-dropdown-item {
+    color: var(--color-black);
+    text-decoration: none;
+}
+
 .navbar-dropdown-item:hover {
     background-color: #f3e8ff;
     color: var(--color-purple);
