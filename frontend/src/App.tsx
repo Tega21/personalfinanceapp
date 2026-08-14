@@ -7,6 +7,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Categories from './pages/Categories';
 import Budgets from './pages/Budgets';
 import Profile from './pages/Profile';
+import Accounts from './pages/Accounts';
+import RecurringTransactions from "./pages/RecurringTransactions.tsx";
+import Forecast from "./pages/Forecast.tsx";
 
 function App() {
     return (
@@ -56,6 +59,30 @@ function App() {
                     </ProtectedRoute>
                 }
             />
+
+            <Route
+                path="/accounts"
+                element={
+                    <ProtectedRoute>
+                        <Accounts />
+                    </ProtectedRoute>
+            }/>
+
+            <Route
+                path="/recurring"
+                element={
+                <ProtectedRoute>
+                    <RecurringTransactions />
+                </ProtectedRoute>
+                }/>
+
+            <Route
+                path="/forecast"
+                element={
+                <ProtectedRoute>
+                    <Forecast />
+                </ProtectedRoute>
+                }/>
 
         </Routes>
     );

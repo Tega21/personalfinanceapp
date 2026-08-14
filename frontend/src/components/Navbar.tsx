@@ -29,6 +29,9 @@ const Navbar = () => {
                 <Link to="/transactions">Transactions</Link>
                 <Link to="/categories">Categories</Link>
                 <Link to="/budgets">Budgets</Link>
+                <Link to="/accounts">Accounts</Link>
+                <Link to="/recurring">Recurring Transactions</Link>
+                <Link to="/forecast">Forecast</Link>
 
                 <div className="navbar-user-menu">
                     <button
