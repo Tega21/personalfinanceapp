@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
@@ -25,13 +25,13 @@ const Navbar = () => {
         <nav className="navbar">
             <div className="navbar-brand">Personal Finance App</div>
             <div className="navbar-links">
-                <Link to="/dashboard">Home</Link>
-                <Link to="/transactions">Transactions</Link>
-                <Link to="/categories">Categories</Link>
-                <Link to="/budgets">Budgets</Link>
-                <Link to="/accounts">Accounts</Link>
-                <Link to="/recurring">Recurring Transactions</Link>
-                <Link to="/forecast">Forecast</Link>
+                <NavLink to="/dashboard" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Home</NavLink>
+                <NavLink to="/transactions" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Transactions</NavLink>
+                <NavLink to="/categories" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Categories</NavLink>
+                <NavLink to="/budgets" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Budgets</NavLink>
+                <NavLink to="/accounts" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Accounts</NavLink>
+                <NavLink to="/recurring" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Recurring</NavLink>
+                <NavLink to="/forecast" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Forecast</NavLink>
 
                 <div className="navbar-user-menu">
                     <button
@@ -46,13 +46,13 @@ const Navbar = () => {
                             <div className="navbar-dropdown-header">
                                 <p className="dropdown-username">{username}</p>
                             </div>
-                            <Link
+                            <NavLink
                                 to="/profile"
                                 className="navbar-dropdown-item"
                                 onClick={() => setDropdownOpen(false)}
                             >
                                 View Profile
-                            </Link>
+                            </NavLink>
                             <button
                                 className="navbar-dropdown-item navbar-dropdown-logout"
                                 onClick={handleLogout}
