@@ -8,10 +8,11 @@ export interface CategoryResponse {
     name: string;
     type: 'INCOME' | 'EXPENSE';
     description: string | null;
+    isDefault: boolean;
 }
 
 /**
- * Shape of the request body for creating a new category.
+ * Shape of the request body for creating or updating a category.
  */
 export interface CategoryRequest {
     name: string;
@@ -43,13 +44,20 @@ export const createCategory = async (
     return response.data;
 };
 
-export interface CategoryResponse {
-    id: number;
-    name: string;
-    type: 'INCOME' | 'EXPENSE';
-    description: string | null;
-    isDefault: boolean;
-}
+/**
+ * Updates an existing custom category.
+ *
+ * @param id the ID of the category to update
+ * @param data the updated name, type, and optional description
+ * @returns the updated category
+ */
+export const updateCategory = async (
+    id: number,
+    data: CategoryRequest
+): Promise<CategoryResponse> => {
+    const response = await api.put<CategoryResponse>(`/categories/${id}`, data);
+    return response.data;
+};
 
 /**
  * Deletes a category.

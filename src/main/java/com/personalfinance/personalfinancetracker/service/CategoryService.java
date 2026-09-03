@@ -145,4 +145,35 @@ public class CategoryService {
 
         categoryRepository.saveAll(categories);
     }
+
+    /**
+     * Updates a custom category, after verifying it belongs to the authenticated
+     * user and is not a default category.
+     *
+     * @param id the ID of the category to update
+     * @param request the updated name, type, and optional description
+     * @param username the authenticated user's username
+     * @return the updated category
+     */
+    public CategoryResponse updateCategory(Long id, CategoryRequest request, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+
+        if (!category.getUser().getId().equals(user.getId())) {
+            throw new UnauthorizedActionException("You do not have permission to update this category");
+        }
+
+        if (category.isDefault()) {
+            throw new UnauthorizedActionException("Default categories cannot be edited");
+        }
+
+        category.setName(request.getName());
+        category.setCategoryType(request.getType());
+        category.setDescription(request.getDescription());
+
+        return mapToResponse(categoryRepository.save(category));
+    }
 }

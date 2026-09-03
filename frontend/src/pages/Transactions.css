@@ -1,60 +1,123 @@
+/* ── Transactions Page ── */
 .transactions-page {
-    padding: 2rem;
+    padding: 2.5rem 3rem;
     color: var(--color-black);
-}
-
-.transactions-header {
-    margin-bottom: 1.5rem;
-}
-
-.action-btn {
-    background-color: var(--color-white);
-    color: var(--color-purple);
-    border: 1px solid var(--color-purple);
-    padding: 0.3rem 0.7rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85rem;
-}
-
-.action-btn:hover {
-    background-color: #f3e8ff;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .transactions-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 1.75rem;
 }
 
+.transactions-header h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-black);
+}
+
+/* ── Buttons ── */
 .primary-btn {
-    background-color: var(--color-purple);
+    background: var(--color-purple);
     color: var(--color-white);
     border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
+    padding: 0.8rem 1.6rem;
+    border-radius: 10px;
     font-weight: 600;
+    font-size: 1.10rem;
     cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-card);
 }
 
 .primary-btn:hover {
-    background-color: var(--color-purple-dark);
+    background: var(--color-purple-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-card-hover);
 }
 
 .primary-btn:disabled {
-    background-color: #c4b5d8;
+    background: #c4b5d8;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
+.action-btn {
+    background: var(--color-white);
+    color: var(--color-purple);
+    border: 1px solid var(--color-gray-border);
+    padding: 0.35rem 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.83rem;
+    font-weight: 500;
+    transition: all 0.15s ease;
+    margin-right: 0.4rem;
+}
+
+.action-btn:hover {
+    background: #f3e8ff;
+    border-color: var(--color-purple);
+}
+
+/* ── Filter Bar (white card) ── */
+.filter-bar {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    background: var(--color-bg-card);
+    padding: 1rem 1.25rem;
+    border-radius: 14px;
+    box-shadow: var(--shadow-card);
+}
+
+.filter-bar select,
+.filter-bar input[type="date"],
+.filter-bar input[type="text"] {
+    padding: 0.5rem 0.7rem;
+    border: 1px solid var(--color-gray-border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: border-color 0.15s ease;
+}
+
+.filter-bar select:focus,
+.filter-bar input:focus {
+    outline: none;
+    border-color: var(--color-purple);
+}
+
+.filter-bar input[type="text"] {
+    min-width: 200px;
+    flex: 1;
+}
+
+/* ── Transaction Form (white card) ── */
 .transaction-form {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    border: 1px solid var(--color-gray-border);
-    border-radius: 8px;
-    padding: 1.25rem;
-    margin-bottom: 1.5rem;
-    max-width: 400px;
+    gap: 0.85rem;
+    background: var(--color-bg-card);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1.75rem;
+    max-width: 460px;
+    box-shadow: var(--shadow-card);
+    animation: fadeInUp 0.35s ease;
+}
+
+.transaction-form h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 700;
 }
 
 .form-row {
@@ -64,35 +127,101 @@
 
 .form-row label {
     font-weight: 600;
-    margin-bottom: 0.3rem;
-    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
+    font-size: 0.85rem;
+    color: #444;
 }
 
 .form-row input,
 .form-row select {
-    padding: 0.5rem;
+    padding: 0.6rem 0.7rem;
     border: 1px solid var(--color-gray-border);
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 0.95rem;
+    transition: border-color 0.15s ease;
 }
 
-.filter-bar {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
-    margin-bottom: 1.25rem;
-    flex-wrap: wrap;
+.form-row input:focus,
+.form-row select:focus {
+    outline: none;
+    border-color: var(--color-purple);
 }
 
-.filter-bar select,
-.filter-bar input[type="date"],
-.filter-bar input[type="text"] {
-    padding: 0.45rem 0.6rem;
-    border: 1px solid var(--color-gray-border);
-    border-radius: 4px;
-    font-size: 0.9rem;
+/* ── Transactions Table (white card) ── */
+.transactions-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-bg-card);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    animation: fadeInUp 0.4s ease;
 }
 
-.filter-bar input[type="text"] {
-    min-width: 180px;
+.transactions-table th,
+.transactions-table td {
+    text-align: left;
+    padding: 0.9rem 1.1rem;
+    border-bottom: 1px solid #f0f0f3;
+}
+
+.transactions-table th {
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #383842;
+    background: #d1d1d8;
+}
+
+.transactions-table tbody tr {
+    transition: background 0.15s ease;
+    background: var(--color-white);
+}
+
+.transactions-table tbody tr:hover {
+    background: #faf8fd;
+}
+
+.transactions-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ── Amounts ── */
+.amount-positive {
+    color: #15803d;
+    font-weight: 600;
+}
+
+.amount-negative {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+/* ── Empty / Error States ── */
+.transactions-page > p {
+    background: var(--color-bg-card);
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-card);
+    color: #9ca3af;
+    text-align: center;
+}
+
+.error-text {
+    background: #fef2f2 !important;
+    color: #dc2626 !important;
+    text-align: left !important;
+}
+
+/* ── Animation ── */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .transactions-page { padding: 1.5rem; }
+    .filter-bar { flex-direction: column; align-items: stretch; }
 }

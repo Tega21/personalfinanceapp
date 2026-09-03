@@ -9,7 +9,7 @@ import './Budgets.css';
 /**
  * Budget Manager page. Displays all budgets for the selected month
  * with color-coded progress bars showing spending vs limit. Supports
- * creating, editing, and deleting budgets.
+ * creating budgets inline, editing via a modal, and deleting.
  */
 const Budgets = () => {
     const now = new Date();
@@ -21,11 +21,15 @@ const Budgets = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
 
+    // Add form state
     const [showForm, setShowForm] = useState(false);
-    const [editingId, setEditingId] = useState<number | null>(null);
     const [selectedCategoryId, setSelectedCategoryId] = useState('');
     const [amountLimit, setAmountLimit] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Edit modal state
+    const [editingBudget, setEditingBudget] = useState<BudgetResponse | null>(null);
+    const [editAmountLimit, setEditAmountLimit] = useState('');
 
     /**
      * Loads budgets for the currently selected month/year and the
@@ -52,27 +56,8 @@ const Budgets = () => {
     }, [month, year]);
 
     const resetForm = () => {
-        setEditingId(null);
         setSelectedCategoryId('');
         setAmountLimit('');
-    };
-
-    const openAddForm = () => {
-        resetForm();
-        setShowForm(true);
-    };
-
-    /**
-     * Opens the form pre-filled with an existing budget's values,
-     * switching into edit mode.
-     *
-     * @param budget the budget to edit
-     */
-    const openEditForm = (budget: BudgetResponse) => {
-        setEditingId(budget.budgetId);
-        setSelectedCategoryId(budget.categoryId.toString());
-        setAmountLimit(budget.amountLimit.toString());
-        setShowForm(true);
     };
 
     const handleToggleForm = () => {
@@ -80,16 +65,13 @@ const Budgets = () => {
             resetForm();
             setShowForm(false);
         } else {
-            openAddForm();
+            resetForm();
+            setShowForm(true);
         }
     };
 
     /**
-     * Submits the add/edit form. Calls createBudget or updateBudget
-     * depending on whether editingId is set, then reloads the budget
-     * list to reflect live spending calculations.
-     *
-     * @param e the form submit event
+     * Submits the add form to create a new budget, then reloads.
      */
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -104,28 +86,58 @@ const Budgets = () => {
         };
 
         try {
-            if (editingId !== null) {
-                await updateBudget(editingId, payload);
-            } else {
-                await createBudget(payload);
-            }
+            await createBudget(payload);
             resetForm();
             setShowForm(false);
             await loadData();
         } catch (err) {
-            setError(editingId !== null
-                ? 'Failed to update budget.'
-                : 'Failed to create budget. A budget for this category may already exist.');
+            setError('Failed to create budget. A budget for this category may already exist.');
         } finally {
             setIsSubmitting(false);
         }
     };
 
     /**
-     * Deletes a budget after a confirmation prompt, then reloads
-     * the budget list.
-     *
-     * @param id the ID of the budget to delete
+     * Opens the edit modal pre-filled with the selected budget's limit.
+     */
+    const openEditModal = (budget: BudgetResponse) => {
+        setEditingBudget(budget);
+        setEditAmountLimit(budget.amountLimit.toString());
+    };
+
+    const closeEditModal = () => {
+        setEditingBudget(null);
+    };
+
+    /**
+     * Submits the edit modal to update the budget's limit, then reloads.
+     */
+    const handleEditSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!editingBudget) return;
+        setIsSubmitting(true);
+        setError('');
+
+        const payload = {
+            categoryId: editingBudget.categoryId,
+            amountLimit: parseFloat(editAmountLimit),
+            month,
+            year,
+        };
+
+        try {
+            await updateBudget(editingBudget.budgetId, payload);
+            closeEditModal();
+            await loadData();
+        } catch (err) {
+            setError('Failed to update budget.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    /**
+     * Deletes a budget after a confirmation prompt, then reloads.
      */
     const handleDelete = async (id: number) => {
         const confirmed = window.confirm('Delete this budget?');
@@ -140,11 +152,7 @@ const Budgets = () => {
     };
 
     /**
-     * Returns the CSS class for a progress bar based on the budget's
-     * status — green for OK, yellow for WARNING, red for EXCEEDED.
-     *
-     * @param status the budget's current status string
-     * @returns the CSS class name for that status
+     * Returns the CSS class for a progress bar based on the budget's status.
      */
     const getProgressClass = (status: string) => {
         if (status === 'EXCEEDED') return 'progress-exceeded';
@@ -185,7 +193,7 @@ const Budgets = () => {
 
             {showForm && (
                 <form className="budget-form" onSubmit={handleSubmit}>
-                    <h2>{editingId !== null ? 'Edit Budget' : 'New Budget'}</h2>
+                    <h2>New Budget</h2>
 
                     <div className="form-row">
                         <label htmlFor="category">Category</label>
@@ -194,17 +202,11 @@ const Budgets = () => {
                             value={selectedCategoryId}
                             onChange={(e) => setSelectedCategoryId(e.target.value)}
                             required
-                            disabled={editingId !== null}
                         >
                             <option value="" disabled>Select a category</option>
-                            {editingId !== null
-                                ? categories
-                                    .filter((c) => c.id === parseInt(selectedCategoryId))
-                                    .map((c) => <option key={c.id} value={c.id}>{c.name}</option>)
-                                : availableCategories.map((c) => (
-                                    <option key={c.id} value={c.id}>{c.name}</option>
-                                ))
-                            }
+                            {availableCategories.map((c) => (
+                                <option key={c.id} value={c.id}>{c.name}</option>
+                            ))}
                         </select>
                     </div>
 
@@ -236,8 +238,8 @@ const Budgets = () => {
                             <div className="budget-card-header">
                                 <span className="budget-category">{budget.categoryName}</span>
                                 <div className="budget-actions">
-                                    <button className="action-btn" onClick={() => openEditForm(budget)}>Edit</button>
-                                    <button className="action-btn" onClick={() => handleDelete(budget.budgetId)}>Delete</button>
+                                    <button className="action-btn edit-btn" onClick={() => openEditModal(budget)}>Edit</button>
+                                    <button className="action-btn delete-btn" onClick={() => handleDelete(budget.budgetId)}>Delete</button>
                                 </div>
                             </div>
 
@@ -261,6 +263,43 @@ const Budgets = () => {
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* Edit Modal */}
+            {editingBudget && (
+                <div className="modal-overlay" onClick={closeEditModal}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <h2>Edit Budget</h2>
+                        <form onSubmit={handleEditSubmit}>
+                            <div className="form-row">
+                                <label>Category</label>
+                                <input type="text" value={editingBudget.categoryName} disabled />
+                            </div>
+
+                            <div className="form-row">
+                                <label htmlFor="editAmountLimit">Monthly Limit ($)</label>
+                                <input
+                                    id="editAmountLimit"
+                                    type="number"
+                                    step="0.01"
+                                    min="0.01"
+                                    value={editAmountLimit}
+                                    onChange={(e) => setEditAmountLimit(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="modal-actions">
+                                <button type="submit" className="primary-btn" disabled={isSubmitting}>
+                                    {isSubmitting ? 'Saving...' : 'Save Changes'}
+                                </button>
+                                <button type="button" className="action-btn" onClick={closeEditModal}>
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             )}
         </div>

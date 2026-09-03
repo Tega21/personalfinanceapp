@@ -3,10 +3,10 @@
   --color-purple-dark: #581c87;
   --color-purple-light: #f3e8ff;
   --color-white: #ffffff;
-  --color-black: rgb(92 7 161 / 0.67);
+  --color-black: rgb(8 8 9 / 0.67);
   --color-gray-border: #ffffff;
-  --color-bg: #777e84;
-  --color-bg-card: rgb(149 142 149);
+  --color-bg: #d7d9dd;
+  --color-bg-card: rgb(255 255 255);
   --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
   --shadow-card-hover: 0 6px 16px rgba(107, 33, 168, 0.15);
 }

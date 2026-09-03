@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import {
     getCategories,
     createCategory,
+    updateCategory,
     deleteCategory,
 } from '../services/categoryService';
 import type { CategoryResponse, CategoryRequest } from '../services/categoryService';
@@ -11,7 +12,7 @@ import './Categories.css';
 /**
  * Categories management screen. Lists the user's categories split into
  * two sections: 15 created defaults and any custom ones the user has
- * created, and supports creating and deleting custom categories.
+ * created, and supports creating, editing, and deleting custom categories.
  */
 const Categories = () => {
     const [categories, setCategories] = useState<CategoryResponse[]>([]);
@@ -23,6 +24,12 @@ const Categories = () => {
     const [type, setType] = useState<'INCOME' | 'EXPENSE'>('EXPENSE');
     const [description, setDescription] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Edit modal state
+    const [editingCategory, setEditingCategory] = useState<CategoryResponse | null>(null);
+    const [editName, setEditName] = useState('');
+    const [editType, setEditType] = useState<'INCOME' | 'EXPENSE'>('EXPENSE');
+    const [editDescription, setEditDescription] = useState('');
 
     const loadCategories = async () => {
         try {
@@ -77,6 +84,48 @@ const Categories = () => {
         }
     };
 
+    /**
+     * Opens the edit modal pre-filled with the selected category's data.
+     */
+    const openEditModal = (c: CategoryResponse) => {
+        setEditingCategory(c);
+        setEditName(c.name);
+        setEditType(c.type);
+        setEditDescription(c.description || '');
+    };
+
+    const closeEditModal = () => {
+        setEditingCategory(null);
+    };
+
+    /**
+     * Submits the edit modal and updates the category in place.
+     */
+    const handleEditSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!editingCategory) return;
+        setIsSubmitting(true);
+        setError('');
+
+        const payload: CategoryRequest = {
+            name: editName,
+            type: editType,
+            ...(editDescription ? { description: editDescription } : {}),
+        };
+
+        try {
+            const updated = await updateCategory(editingCategory.id, payload);
+            setCategories((prev) =>
+                prev.map((c) => (c.id === editingCategory.id ? updated : c))
+            );
+            closeEditModal();
+        } catch (err) {
+            setError('Failed to update category. The name may already be in use.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     const handleDelete = async (id: number) => {
         const confirmed = window.confirm(
             'Delete this category? This cannot be undone, and any existing transactions using it may be affected.'
@@ -91,13 +140,22 @@ const Categories = () => {
         }
     };
 
+    /**
+     * Renders a category row. Custom categories get Edit + Delete;
+     * default categories get Delete only.
+     */
     const renderRow = (c: CategoryResponse) => (
         <tr key={c.id}>
             <td>{c.name}</td>
             <td>{c.type}</td>
             <td>{c.description || '—'}</td>
             <td>
-                <button className="action-btn" onClick={() => handleDelete(c.id)}>
+                {!c.isDefault && (
+                    <button className="action-btn edit-btn" onClick={() => openEditModal(c)}>
+                        Edit
+                    </button>
+                )}
+                <button className="action-btn delete-btn" onClick={() => handleDelete(c.id)}>
                     Delete
                 </button>
             </td>
@@ -193,6 +251,58 @@ const Categories = () => {
                     </thead>
                     <tbody>{customCategories.map(renderRow)}</tbody>
                 </table>
+            )}
+
+            {/* Edit Modal */}
+            {editingCategory && (
+                <div className="modal-overlay" onClick={closeEditModal}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <h2>Edit Category</h2>
+                        <form onSubmit={handleEditSubmit}>
+                            <div className="form-row">
+                                <label htmlFor="editName">Name</label>
+                                <input
+                                    id="editName"
+                                    type="text"
+                                    value={editName}
+                                    onChange={(e) => setEditName(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-row">
+                                <label htmlFor="editType">Type</label>
+                                <select
+                                    id="editType"
+                                    value={editType}
+                                    onChange={(e) => setEditType(e.target.value as 'INCOME' | 'EXPENSE')}
+                                >
+                                    <option value="EXPENSE">Expense</option>
+                                    <option value="INCOME">Income</option>
+                                </select>
+                            </div>
+
+                            <div className="form-row">
+                                <label htmlFor="editDescription">Description (optional)</label>
+                                <input
+                                    id="editDescription"
+                                    type="text"
+                                    value={editDescription}
+                                    onChange={(e) => setEditDescription(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="modal-actions">
+                                <button type="submit" className="primary-btn" disabled={isSubmitting}>
+                                    {isSubmitting ? 'Saving...' : 'Save Changes'}
+                                </button>
+                                <button type="button" className="action-btn" onClick={closeEditModal}>
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             )}
         </div>
     );

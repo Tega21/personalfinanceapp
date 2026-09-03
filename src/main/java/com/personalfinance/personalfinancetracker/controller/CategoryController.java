@@ -70,4 +70,22 @@ public class CategoryController {
                 categoryService.getUserCategories(userDetails.getUsername())
         );
     }
+
+    /**
+     * Updates a custom category belonging to the authenticated user.
+     *
+     * @param id the ID of the category to update
+     * @param request the updated category fields
+     * @param userDetails the authenticated user, injected from the JWT
+     * @return 200 OK with the updated category
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoryResponse> updateCategory(
+            @PathVariable Long id,
+            @Valid @RequestBody CategoryRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(
+                categoryService.updateCategory(id, request, userDetails.getUsername())
+        );
+    }
 }
